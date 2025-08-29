@@ -11,7 +11,8 @@ import { useEditorSuggestion } from "./useEditorSuggestion.js";
 /**
  *
  * @param {{
- *    settings: import("../../app/app.js").Settings
+ *    settings: import("../aiting.js").Settings,
+ *    feature: import("../aiting.js").Feature
  * }} api
  * @returns
  */
@@ -53,6 +54,7 @@ export const useEditor = (api) => {
   const suggestionCore = useEditorSuggestion({
     editor: editorCore,
     settings: api.settings,
+    feature: api.feature,
   });
   const { suggestion, useSuggestion, createSuggestion, clearSuggestion } =
     suggestionCore;

@@ -66,7 +66,7 @@ export const registerHead = (head, fn) => {
 };
 
 export const registerMetaTag = (meta, fn) => {
-  console.log("register", meta);
+  //console.log("register", meta);
   const observer = new MutationObserver((mutations) => {
     mutations.forEach((mutation) => {
       if (mutation.type === "attributes" || mutation.type === "childList") {

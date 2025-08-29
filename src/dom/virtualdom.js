@@ -1,15 +1,16 @@
 //@ts-check
 
 /**
- * @typedef {"button" | "div" | "p" | "h1" | "input" | "img" | "a" | "h2" | "h3" | "h4" | "h5" | "h6"} VNodeType
+ * @typedef {"button" | "div" | "p" | "h1" | "input" | "img" | "a" | "h2" | "h3" | "h4" | "h5" | "h6" | "link" | "span"} VNodeType
  *
  * @typedef VNodeProps
- * @property {(e)=> {}?} onClick
- * @property {(e)=> {}?} onChange
- * @property {string?} style
- * @property {string?} class
- * @property {string?} innerHTML
- * @property {object?} attr
+ * @property {(e)=> void} [onClick]
+ * @property {(e)=> void} [onChange]
+ * @property {string} [style]
+ * @property {string} [class]
+ * @property {string} [innerHTML]
+ * @property {object} [attr]
+ * @property {} [ref]
  *
  * @typedef {VNode | string | boolean | number} VNodeChild
  * @typedef {Array<VNodeChild>} VNodeChildren
@@ -60,6 +61,11 @@ const componentRenderHelperChildren = (el, children) => {
 export const handleEvent = {
   onClick: "click",
   onChange: "change",
+  onInput: "input",
+  onKeyDown: "keydown",
+  onPaste: "paste",
+  onMouseMove: "mousemove",
+  onMouseLeave: "mouseleave",
 };
 
 /**
@@ -233,7 +239,12 @@ const patchText = (element, vnode, oldNode) => {
  */
 const componentPatchHelper = (parent, vnodeOld, vnodeNew, index = 0) => {
   const thisEl = parent.childNodes[index];
+
+  // todo: 謎。多分バグってたらこれが原因
+  //if (!thisEl) return;
+
   const [isSome, reason] = isSomeElement(vnodeOld, vnodeNew);
+  //console.log("componentPatchHelper", isSome, reason, vnodeNew, vnodeOld)
 
   if (!isSome) patchElement(parent, thisEl, reason, vnodeNew, vnodeOld);
   /**
@@ -247,8 +258,21 @@ const componentPatchHelper = (parent, vnodeOld, vnodeNew, index = 0) => {
    */
   if (!Array.isArray(vnodeNew.children)) return;
 
+  let k = 0;
   return vnodeNew.children.map((_, i) => {
     const [oldChild, newChild] = [vnodeOld.children[i], vnodeNew.children[i]];
+
+    if (!thisEl) {
+      console.warn(
+        thisEl,
+        parent.childNodes,
+        index,
+        parent,
+        vnodeOld,
+        vnodeNew,
+      );
+    }
+
     /**
      * この時点で子要素が文字だと分かった場合は、子要素が変更されてるか確認して早めに切り上げる
      */
@@ -258,8 +282,31 @@ const componentPatchHelper = (parent, vnodeOld, vnodeNew, index = 0) => {
     /**
      * 子要素に対しても同じように再起的に処理を加えていく
      */
-    componentPatchHelper(thisEl, oldChild, newChild, i);
+
+    // [h(), h()]のときにvnodeNewが[..., ...]として配列で渡されてしまうので応急処置
+    if (Array.isArray(newChild)) {
+      newChild.map((_, j) => {
+        const [oldChild, newChild] = [
+          vnodeOld.children[i][j],
+          vnodeNew.children[i][j],
+        ];
+        componentPatchHelper(thisEl, oldChild, newChild, k);
+        k++;
+      });
+      k--;
+    }
+    if (!Array.isArray(newChild)) {
+      componentPatchHelper(thisEl, oldChild, newChild, k);
+    }
+    k++;
+    //console.log(k, newChild);
   });
+};
+
+const timeKeeper = (fn) => {
+  const d = Date.now();
+  fn();
+  return Date.now() - d;
 };
 
 /**
@@ -280,28 +327,38 @@ export class Page {
     this.old = {};
   }
   render() {
-    const res = this.page();
-    const root = document.getElementById("root");
-    this.old = res;
-    const v = componentRenderHelper(res);
-    root?.replaceChildren(v);
+    const ms = timeKeeper(() => {
+      const res = this.page();
+      const root = document.getElementById("root");
+      this.old = res;
+      const v = componentRenderHelper(res);
+      root?.replaceChildren(v);
+    });
+    console.log("render: ", ms);
   }
   patch() {
-    const res = this.page();
-    const root = document.getElementById("root");
-    componentPatchHelper(root, this.old, res);
-    this.old = res;
+    const ms = timeKeeper(() => {
+      const res = this.page();
+      const root = document.getElementById("root");
+      componentPatchHelper(root, this.old, res);
+      //console.log(res);
+      this.old = res;
+    });
+    console.log("patch: ", ms);
   }
 }
 
 /**
  * コンポーネント、何もしない、ただのファイル分け用
  * @template T
- * @param {(props: T)=> any} c
- * @returns (props: T) => any
+ * @param {(props: T)=> VNode} c
+ * @returns (props: T) => VNode
  */
 export const component = (c) => {
-  return (props) => {
+  /**
+   * @type{(props: T)=> VNode}
+   */
+  return function res(props) {
     return c(props);
   };
 };

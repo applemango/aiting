@@ -34,7 +34,8 @@ import {
 /**
  * @param {{
  *  editor: import("./useEditorCore").useEditorCoreApi,
- *  settings: import("../../app/app.js").Settings
+ *  settings: import("../aiting.js").Settings,
+ *  feature: import("../aiting.js").Feature
  * }} api
  * @returns
  */
@@ -125,6 +126,8 @@ export const useEditorSuggestion = (api) => {
   useEffect(
     "useEditorSuggestionEffect",
     () => {
+      if (!api.feature.autoCompleting) return;
+
       const suggest = suggestion();
       if (!suggest) return;
 
