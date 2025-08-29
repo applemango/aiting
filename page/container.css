@@ -1,0 +1,10 @@
+.AitingAppModeSelectorContainer {
+    margin-left: -32px;
+}
+.AitingAppBodyContainer {
+    box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+    padding-bottom: 48px;
+    padding: 32px;
+    border-radius: 8px;
+    margin-top: 42px;
+}
