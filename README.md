@@ -8,11 +8,26 @@
   - たった数文字書くだけであとはAIが勝手に続きを書いてくれます
   - シンプルなUIで余計な情報をそぎ落とし、ユーザーに迷いを与えません!
 
-## TODO
+## TODO - Feature
 
 * [X] オートコンプリート
-* [ ] 文章のスタイルをワンクリックで変えられる
+* [X] 文章のスタイル、目的をワンクリックで変えられる
 * [ ] 一度作った文章の保存
+* [X] いんふぃにースクロールモード ( ideaを100個生成させるときとか用にスクロールすれば無限にAIが生成する機能 )
+
+## TODO - logic
+* [ ] 文法チェッカーを`editor/hook/useEditorGrammar.js`に移す
+* [ ] LLM呼び出しを`editor/hook/useEditorCoreLLM.js`に移す
+* [X] コンポーネント化する
+* [ ] 関数を構造化する
+
+## TODO - Impossible
+* [ ] Server Side Rendering
+* [ ] Server Side Generate
+* [ ] Server Components
+* [ ] Advanced Routing / Nested Layouts
+* [ ] Build
+
 
 ## よくわからないはなし
 
