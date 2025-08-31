@@ -15,8 +15,6 @@ import {
 import { AitingAppCopyButton } from "./aitingAppCopyButton.js";
 import { useWrittingMode } from "./hook/useWrittingMode.js";
 
-//https://materialui.co/colors
-
 export const AitingApp = component(({ init }) => {
   const [account, setAccount] = useAccount();
   const [settings, setSettings] = useSettings();

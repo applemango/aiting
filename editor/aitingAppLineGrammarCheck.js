@@ -4,42 +4,13 @@ import { Box, Text } from "../components/box.js";
 import { useState } from "../hook/useState.js";
 import { s } from "../src/dom/style.js";
 import { h } from "../src/dom/virtualdom.js";
-
-export const useLineState = (line) => {
-  /**
-   * @typedef {{type: string, title: string, description: string, position: {offset: number, length: number}, current: string, content: string, id: string}} fixSuggestion
-   * @type {typeof useState<Array<fixSuggestion>>}
-   */
-  const useFixSuggestionState = useState;
-  const [fixSuggestions, setFixSuggestions] = useFixSuggestionState(
-    line.id.concat("_fixSuggestions"),
-    [],
-  );
-
-  const [activeFixSuggestion, setActiveFixSuggestion] = useState(
-    line.id.concat("_activefixSuggestions"),
-    "",
-  );
-
-  const [previousLineText, setPreviousLineText] = useState(
-    line.id.concat("_previousLineTextEffect"),
-    line.text,
-  );
-
-  return {
-    fixSuggestions,
-    setFixSuggestions,
-    activeFixSuggestion,
-    setActiveFixSuggestion,
-    previousLineText,
-    setPreviousLineText,
-  };
-};
+import { useLineState } from "./aitingAppLine.js";
 
 export function handleHoverEvent(line, e) {
   const { activeFixSuggestion, setActiveFixSuggestion } = useLineState(line);
 
   /**
+   * 要素がhoverされているかどうか
    * @param {Element | null} el
    * @param {number} padding
    */
@@ -55,6 +26,9 @@ export function handleHoverEvent(line, e) {
     );
   }
 
+  /**
+   * すでにactiveな要素がまだhover状態ならスキップする
+   */
   const active = activeFixSuggestion();
   if (
     active &&
@@ -67,6 +41,12 @@ export function handleHoverEvent(line, e) {
   ) {
     return;
   }
+
+  /**
+   * すべてのtooltipに対してhover状態かどうか調べて
+   * hover状態ならactiveにする
+   * 編集ができるようにするために、pointerEvents: noneなのでcssが使えない
+   */
   const tooltips = Array.from(
     document.querySelectorAll(
       `.textarea[id=\"${line.id}\"]+.suggestion .fixSuggestionCurrent`,
@@ -85,7 +65,9 @@ export function handleHoverEvent(line, e) {
 }
 
 /**
- * @param {fixSuggestion} fixSuggestion
+ * @param {import("./aitingAppLine.js").FixSuggestion} fixSuggestion
+ * @param {import("./hook/useEditorCore.js").Line} line
+ * @param {(suggest: import("./aitingAppLine.js").FixSuggestion)=> void} useFixSuggestion
  */
 function toolTip(fixSuggestion, line, useFixSuggestion) {
   const {
@@ -118,7 +100,7 @@ function toolTip(fixSuggestion, line, useFixSuggestion) {
         cursor: "pointer",
         pointerEvents: "all",
         border: "1px solid #E91E63",
-        "backdrop-filter": "blur(4px)",
+        backdropFilter: "blur(4px)",
         background: "#ffffffcc",
       }),
     },
@@ -137,7 +119,7 @@ function toolTip(fixSuggestion, line, useFixSuggestion) {
 
 /**
  * @param {string} text
- * @param {Array<fixSuggestion & {childrens: structed}>} structed
+ * @param {Array<import("./aitingAppLine.js").FixSuggestion & {childrens: structed}>} structed
  * @returns {Array<string | import("../src/dom/virtualdom.js").VNode>}
  */
 export function AitingAppLineGrammarSuggestions(

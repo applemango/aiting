@@ -2,6 +2,26 @@
 
 import { Page } from "../src/dom/virtualdom.js";
 
+/**
+ * @typedef {{
+    total: number;
+    pass: number;
+    fail: number;
+    errors: {
+        test: {
+            expect: any;
+            toBe: any;
+        };
+        name: string;
+    }[]
+ * }} TestResult
+ */
+
+/**
+ * テストを実行しやすくする
+ * ただしテストするものが多様なのでできるだけ普遍的に拡張できるように定義する
+ * parseExpectなどは拡張前提
+ */
 class Test {
   /**
    * @type {Object.<string, Array<{expect: any, toBe: any}>>}
@@ -30,12 +50,29 @@ class Test {
     fn(this);
     return this;
   }
+
+  /**
+   * @param {any} something
+   * @returns
+   */
+  parseExpect(something) {
+    return something;
+  }
+
+  /**
+   * @param {any} someting
+   * @returns
+   */
+  parseToBe(someting) {
+    return someting;
+  }
+
   /**
    * @param {any} something
    * @returns this
    */
   expect(something) {
-    this.#expectState = { expect: something };
+    this.#expectState = { expect: this.parseExpect(something) };
     return this;
   }
   /**
@@ -44,7 +81,7 @@ class Test {
   toBe(something) {
     this.#testCase[this.#describeState.name].push({
       expect: this.#expectState.expect,
-      toBe: something,
+      toBe: this.parseToBe(something),
     });
   }
   equal(a, b) {
@@ -55,18 +92,7 @@ class Test {
     return a == b;
   }
   /**
-   * @returns { {
-      total: number;
-      pass: number;
-      fail: number;
-      errors: {
-          test: {
-              expect: any;
-              toBe: any;
-          };
-          name: string;
-      }[];
-  }[]}
+   * @returns { TestResult[]}
    */
   run() {
     const result = [];
@@ -97,17 +123,28 @@ class Test {
   }
 }
 
+/**
+ * 普通の関数のテスト用。特に手を加える必要はない
+ */
 export class TestFunction extends Test {}
 
+/**
+ * 毎回最初からレンダリングするテスト。
+ * 普通のコンポーネントに対してはこっちのほうが早いのでこれを使う
+ */
 export class TestVDOMRender extends Test {
-  equal(vdom, html) {
+  parseExpect(vdom) {
     const root = document.createElement("body");
     const p = new Page(() => vdom, root);
     p.render();
-    return root.innerHTML == html;
+    return root.innerHTML;
   }
 }
 
+/**
+ * すべてのテストケースで共有のrootを使用する
+ * DOMの変更が追随するか見る
+ */
 export class TestVDOM extends Test {
   constructor(vdom) {
     super();
@@ -115,8 +152,8 @@ export class TestVDOM extends Test {
     this.page = new Page(null, this.root);
     this.page.render(vdom);
   }
-  equal(vdom, html) {
+  parseExpect(vdom) {
     this.page.patch(vdom);
-    return this.root.innerHTML == html;
+    return this.root.innerHTML;
   }
 }

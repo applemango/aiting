@@ -9,6 +9,8 @@ const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 /**
  * intervalはms
+ * 子要素の下が見えてるときにloadイベントが発火する
+ *
  * @type {typeof component<{
  *  load: (i: number)=> Promise<any>,
  *  children: import("../src/dom/virtualdom").VNode,

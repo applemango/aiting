@@ -25,6 +25,11 @@ const useWindowSize = () => {
   return windowSize();
 };
 
+/**
+ * 将来的により複雑なページ移動を実装する可能性があり
+ * また説明ページは二度とアクセスしないと思うので
+ * こんな疑似ルーティングすることになった
+ */
 export const App = page(() => {
   const [active, setActive] = useLocalStorageState("aitingApp", false);
 
@@ -38,9 +43,12 @@ export const App = page(() => {
       const metas = Array.from(document.querySelectorAll("meta[state_id]"));
       for (const meta of metas) {
         if (
-          !["aitingApp", "removeAllState"].includes(
-            meta.attributes.state_id.value,
-          )
+          ![
+            "aitingApp",
+            "removeAllState",
+            "useWindowSizeEffect",
+            "useWindowSizeState",
+          ].includes(meta.attributes.state_id.value)
         ) {
           meta.remove();
         }

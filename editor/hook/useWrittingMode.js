@@ -1,4 +1,6 @@
 //@ts-check
+import { useState } from "../../hook/useState.js";
+
 /**
  * @typedef WrittingMode
  * @property {{
@@ -11,13 +13,13 @@
  *     prompt: string,
  *     context: string,
  *   },
- *   feature: Feature,
+ *   feature: import("./useFeatures.js").Feature
  * }} config
  * @property {number} id
  */
-
-import { useState } from "../../hook/useState.js";
-
+/**
+ * 文章を書くときのモード
+ */
 export const useWrittingMode = () => {
   /**
    * @type {typeof useState<number>}
@@ -41,7 +43,8 @@ export const useWrittingMode = () => {
         feature: {
           autoCompleting: true,
           autoGrammarCheck: false,
-          autoGenerate: false,
+          autoGenerate: true,
+          title: true,
         },
       },
       id: 0,

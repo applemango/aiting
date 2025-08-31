@@ -79,6 +79,9 @@ export function updateFixSuggestions(suggestions, text, previous) {
   }
   detectChange(previous, text);
 
+  /**
+   * すでに修正されている、あるいは消されているのに残ってるやつを削除する
+   */
   function deleteGhostSuggestion() {
     res = res.filter((s) => {
       const matches = Array.from(text.matchAll(new RegExp(s.current, "g")));
@@ -90,13 +93,19 @@ export function updateFixSuggestions(suggestions, text, previous) {
   return res;
 }
 
+/**
+ * AIが出した修正案の座標などを修正する
+ * @param {*} suggestions
+ * @returns
+ */
 export function parseFixSuggestions(suggestions) {
   const sortedFixSuggestions = quickSort(
     suggestions,
     (a, b) => a.position.offset < b.position.offset,
   );
   /**
-   * @param {Array<fixSuggestion & {childrens: sorted}>} sorted
+   * AIが投げてきた結果を正規化する
+   * @param {Array<import("./aitingAppLine.js").FixSuggestion & {childrens: sorted}>} sorted
    */
   const structfy = (sorted) => {
     if (sorted.length == 1) return sorted;
@@ -144,7 +153,9 @@ export function parseFixSuggestions(suggestions) {
     return structed;
   };
 
-  // 稀にLLMが修正不能なやつを投げてくる
+  /*
+   * 稀にLLMが修正不能なやつを投げてくるのでエラーが発生するときがある
+   */
   try {
     const structedFixSuggestions = structfy(
       sortedFixSuggestions.map((s) => ({ ...s, childrens: [] })),

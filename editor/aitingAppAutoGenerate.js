@@ -73,7 +73,7 @@ export const AitingAppInfiniteGenerateActivateButton =
   });
 
 /**
- * @type {typeof component<VNodeChildren>}
+ * @type {typeof component<{children: import("../src/dom/virtualdom.js").VNode, api: import("./hook/useEditor.js").useEditorApi}>}
  */
 const AitingAppInfiniteGenerateWrapperComponent = component;
 export const AitingAppInfiniteGenerateWrapper =

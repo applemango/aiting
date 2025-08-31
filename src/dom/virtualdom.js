@@ -6,11 +6,15 @@
  * @typedef VNodeProps
  * @property {(e)=> void} [onClick]
  * @property {(e)=> void} [onChange]
+ * @property {(e)=> void} [onMouseMove]
+ * @property {(e)=> void} [onMouseLeave]
+ * @property {(e)=> void} [onPaste]
+ * @property {(e)=> void} [onKeyDown]
+ * @property {(e)=> void} [onInput]
  * @property {string} [style]
  * @property {string} [class]
  * @property {string} [innerHTML]
  * @property {object} [attr]
- * @property {} [ref]
  *
  * @typedef {VNode | string | boolean | number} VNodeChild
  * @typedef {Array<VNodeChild>} VNodeChildren
@@ -240,11 +244,7 @@ const patchText = (element, vnode, oldNode) => {
 const componentPatchHelper = (parent, vnodeOld, vnodeNew, index = 0) => {
   const thisEl = parent.childNodes[index];
 
-  // todo: 謎。多分バグってたらこれが原因
-  //if (!thisEl) return;
-
   const [isSome, reason] = isSomeElement(vnodeOld, vnodeNew);
-  //console.log("componentPatchHelper", isSome, reason, vnodeNew, vnodeOld)
 
   if (!isSome) patchElement(parent, thisEl, reason, vnodeNew, vnodeOld);
   /**
@@ -299,7 +299,6 @@ const componentPatchHelper = (parent, vnodeOld, vnodeNew, index = 0) => {
       componentPatchHelper(thisEl, oldChild, newChild, k);
     }
     k++;
-    //console.log(k, newChild);
   });
 };
 

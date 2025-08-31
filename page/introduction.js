@@ -264,7 +264,7 @@ export const Introduction = component(() => {
               }),
             },
             h("img", {
-              attr: { src: "./page/assets/grammar.png" },
+              attr: { src: "./page/assets/autogenerate.png" },
               style: s({ width: "100%" }),
             }),
           ),
@@ -314,7 +314,7 @@ export const Introduction = component(() => {
               }),
             },
             h("img", {
-              attr: { src: "./page/assets/grammar.png" },
+              attr: { src: "./page/assets/suggest.png" },
               style: s({ width: "100%" }),
             }),
           ),

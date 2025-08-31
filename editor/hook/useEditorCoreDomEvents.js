@@ -45,6 +45,11 @@ const appendDefaultEvent = (events) => {
  */
 
 /**
+ * ユーザーがLineに対してなにか操作をするとここにイベントとして入ってくる
+ * ただ直接的な操作はブラウザがやるので、受け取ったイベントを処理して
+ * いい感じに統合性を保ったままuseEditorSuggestionとかに渡す処理が主
+ * ブラウザができないLineの削除やコピペなどはここで処理する
+ *
  * @param {{
  *  editor: import("./useEditorCore.js").useEditorCoreApi,
  *  suggestion: import("./useEditorSuggestion.js").useEditorSuggestionApi,
@@ -65,7 +70,10 @@ export const useEditorCoreDomEvents = (api) => {
       onInput: (e) => onInputEvent(e, index),
       onPaste: (e) => onPasteEvent(e, index),
       _: (e) => {
-        //console.log(e.keyCode)
+        /**
+         * なにか入力が発生したときにレコメンデーションを中止する
+         * 但し一部のキーは関係ないので中止しない
+         */
         if (e.keyCode == KeyCode.tab || e.keyCode == 91 || e.keyCode == 0)
           return;
         api.suggestion.clearSuggestion();
@@ -118,12 +126,18 @@ export const useEditorCoreDomEvents = (api) => {
    */
   const onKeyDownEvent = (e, index) => {
     const line = api.editor.state()[index];
+
+    /**
+     * デフォルトの動作が厄介なやつはデフォルトの動作を打ち消す
+     */
     if ([KeyCode.tab].includes(e.keyCode)) {
       e.preventDefault();
     }
 
+    /**
+     * サジェストの使用
+     */
     if (e.keyCode == KeyCode.tab) {
-      //console.log("tab", api.suggestion.suggestion())
       const suggest = api.suggestion.suggestion();
       if (suggest) {
         insertText(line, line.text.length, suggest.suggestions[0].trim());
@@ -131,11 +145,17 @@ export const useEditorCoreDomEvents = (api) => {
       }
     }
 
+    /**
+     * 改行の処理
+     */
     if (e.keyCode == KeyCode.enter && (e.ctrlKey || e.metaKey)) {
       e.preventDefault();
       return;
     }
 
+    /**
+     * 新しい行の作成
+     */
     if (
       e.keyCode == KeyCode.enter &&
       getCursorPosition() === line.text.length &&
@@ -145,6 +165,9 @@ export const useEditorCoreDomEvents = (api) => {
       onCreateLine(undefined, index + 1);
     }
 
+    /**
+     * 行に何も入力されてなくて削除キーが押されたときは行を削除
+     */
     if (
       e.keyCode == KeyCode.delete &&
       (!line.text.length || line.text == "\n")
@@ -152,6 +175,7 @@ export const useEditorCoreDomEvents = (api) => {
       onDeleteLine(line);
       return;
     }
+
     if (e.keyCode == KeyCode.delete && !line.text.trim().length) {
       api.editor.updateLine({
         id: line.id,
@@ -162,6 +186,9 @@ export const useEditorCoreDomEvents = (api) => {
       return;
     }
 
+    /**
+     * キーボードで行間移動をできるようにする
+     */
     if (
       e.keyCode == KeyCode.arrowUp &&
       getCursorPosition() === 0 &&

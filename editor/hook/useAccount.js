@@ -7,6 +7,8 @@ import { useLocalStorageState } from "../../hook/useLocalStorageState.js";
  */
 
 /**
+ * 将来的にアカウント単位で値 (設定等) を保存するときを見越して
+ *
  * @returns { [() => null | Account, (account: Account)=> void] }
  */
 export const useAccount = () => {

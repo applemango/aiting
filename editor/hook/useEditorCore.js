@@ -42,6 +42,11 @@ import { useEditorCoreRef } from "./useEditorCoreRef.js";
  * @property {()=> string} getContent
  */
 
+/**
+ * LineのCRUDに必要なものすべて。
+ * CUDの操作はすべてこれを通じて行われる
+ * Rはstateを直で読むときが例外としてある
+ */
 export const useEditorCore = () => {
   /** @type {typeof useEditorCoreArrayController<Line>} */
   const _useEditorCoreArrayController = useEditorCoreArrayController;

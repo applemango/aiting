@@ -7,7 +7,6 @@ import { component, h } from "../src/dom/virtualdom.js";
 import {
   AitingAppLineGrammarSuggestions,
   handleHoverEvent,
-  useLineState,
 } from "./aitingAppLineGrammarCheck.js";
 
 import { AitingAppLineSixdot } from "./aitingAppLineSixdotMenu.js";
@@ -19,7 +18,41 @@ import {
 import { getFixSuggestions, getRewritedText } from "./aitingAppLLM.js";
 
 /**
- * @type {typeof component<{}>}
+ * @typedef {{type: string, title: string, description: string, position: {offset: number, length: number}, current: string, content: string, id: string}} FixSuggestion
+ */
+
+export const useLineState = (line) => {
+  /**
+   * @type {typeof useState<Array<FixSuggestion>>}
+   */
+  const useFixSuggestionState = useState;
+  const [fixSuggestions, setFixSuggestions] = useFixSuggestionState(
+    line.id.concat("_fixSuggestions"),
+    [],
+  );
+
+  const [activeFixSuggestion, setActiveFixSuggestion] = useState(
+    line.id.concat("_activefixSuggestions"),
+    "",
+  );
+
+  const [previousLineText, setPreviousLineText] = useState(
+    line.id.concat("_previousLineTextEffect"),
+    line.text,
+  );
+
+  return {
+    fixSuggestions,
+    setFixSuggestions,
+    activeFixSuggestion,
+    setActiveFixSuggestion,
+    previousLineText,
+    setPreviousLineText,
+  };
+};
+
+/**
+ * @type {typeof component<{line: import("./hook/useEditorCore.js").Line, api: import("./hook/useEditor.js").useEditorApi & any, i: number}>}
  */
 const AitingAppLineCompoent = component;
 export const AitingAppLine = AitingAppLineCompoent(({ line, api, i }) => {
@@ -46,6 +79,10 @@ export const AitingAppLine = AitingAppLineCompoent(({ line, api, i }) => {
     );
   }
 
+  /**
+   * 軽微なLine変更に対してサジェストを追随させる
+   * ( 少し書き足したくらいのときにサジェストを全変更するのは大げさすぎる )
+   */
   function updateFixSuggestion() {
     setFixSuggestions(
       updateFixSuggestions(fixSuggestions(), line.text, previousLineText()),
@@ -61,6 +98,9 @@ export const AitingAppLine = AitingAppLineCompoent(({ line, api, i }) => {
     setActiveFixSuggestion("");
   }
 
+  /**
+   * Lineが変更されて5秒間変更がなければ文法などをチェックする
+   */
   useEffect(
     line.id.concat("_fixSuggestionLineChangeEffect"),
     () => {
@@ -118,7 +158,8 @@ export const AitingAppLine = AitingAppLineCompoent(({ line, api, i }) => {
             attr: {
               contenteditable: "",
               id: api.editor.getLineRefId(line),
-              class: "textarea", //.concat(!i ? " bold" : ""),
+              // titleを大きく表示するときはbold classをつける
+              class: "textarea", //.concat(!i && api.feature.title ? " bold" : ""),
             },
             onMouseMove: (e) => handleHoverEvent(line, e),
           },
@@ -127,7 +168,9 @@ export const AitingAppLine = AitingAppLineCompoent(({ line, api, i }) => {
         // 色をつけたりハイライトしたりただ色をつけるだけのレイヤー
         Box(
           {
-            attr: { class: "textarea suggestion" },
+            attr: {
+              class: "textarea suggestion",
+            },
             style: s({
               position: "absolute",
             }),
@@ -141,16 +184,11 @@ export const AitingAppLine = AitingAppLineCompoent(({ line, api, i }) => {
         ),
 
         // 補完を表示するレイヤー
-        IfBox(
-          // 将来のために残しておく
-          true ||
-            Boolean(
-              api.suggestion.suggestion() &&
-                i == api.suggestion.suggestion()?.info.focus &&
-                api.suggestion.suggestion()?.suggestions.length,
-            ),
+        Box(
           {
-            attr: { class: "textarea suggestion" },
+            attr: {
+              class: "textarea suggestion",
+            },
             style: s({
               zIndex: -1,
             }),
@@ -158,7 +196,9 @@ export const AitingAppLine = AitingAppLineCompoent(({ line, api, i }) => {
           line.text.concat(
             i == api.suggestion.suggestion()?.info.focus
               ? api.suggestion.suggestion()?.suggestions[0] || ""
-              : "",
+              : !i && api.feature.title && !line.text
+                ? "title ( タイトルを書いたら次の行で文章を続けてね! )"
+                : "",
           ),
         ),
       ];

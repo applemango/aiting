@@ -32,10 +32,12 @@ import {
  */
 
 /**
+ *　レコメンデーションを管理する
+ *
  * @param {{
  *  editor: import("./useEditorCore").useEditorCoreApi,
- *  settings: import("../aiting.js").Settings,
- *  feature: import("../aiting.js").Feature
+ *  settings: import("./useSettings.js").Settings,
+ *  feature: import("./useFeatures.js").Feature
  * }} api
  * @returns
  */
@@ -61,7 +63,7 @@ export const useEditorSuggestion = (api) => {
    */
   const getPrompt = (info) => {
     return `${api.settings.recommendation.prompt}`.concat(
-      `title: ${info.title}\ncontext:\n${info.context}`,
+      `\n参考情報\ntitle: ${info.title}\ncontext:\n${info.context}`,
     );
   };
 
@@ -91,10 +93,28 @@ export const useEditorSuggestion = (api) => {
       if (newSuggestionId && suggestionId && newSuggestionId == suggestionId) {
         console.log("execute", suggestionId, newSuggestionId);
         const suggest = await fn();
+
+        /**
+         * @param {string} suggest
+         */
+        function parseSuggest(suggest) {
+          const info = suggestion()?.info;
+          if (!info) return suggest;
+          console.log(
+            info.text.trim(),
+            suggest.trim(),
+            suggest.startsWith(info.text),
+          );
+          if (suggest.startsWith(info.text)) {
+            return suggest.slice(info.text.length);
+          }
+          return suggest;
+        }
+
         const s = suggestion();
         if (s) {
-          console.log({ info: s.info, suggestions: [suggest] });
-          setSuggestion({ info: s.info, suggestions: [suggest] });
+          console.log({ info: s.info, suggestions: [parseSuggest(suggest)] });
+          setSuggestion({ info: s.info, suggestions: [parseSuggest(suggest)] });
         }
         return clearInterval(timeout);
       }
@@ -163,7 +183,7 @@ export const useEditorSuggestion = (api) => {
               contents: [
                 {
                   role: "user",
-                  parts: [{ text: baseText }, { text }],
+                  parts: [{ text: baseText.concat("\nuser: ".concat(text)) }],
                 },
               ],
             }),

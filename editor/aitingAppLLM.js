@@ -23,7 +23,7 @@ export const loadInfiniteGenerateItems = async (prompt, previous) => {
           role: "user",
           parts: [
             {
-              text: "ユーザーから渡された情報を元に10個程度のものを羅列してください、但しいきなり始めてください。箇条書きなどにせずにプレーンテキストで一つ毎に改行のみしてください",
+              text: `ユーザーから渡された情報を元に10個程度のものを羅列してください、但しいきなり始めてください。箇条書きなどにせずにプレーンテキストで一つ毎に改行のみしてください`,
             },
             {
               text: prompt.concat(
@@ -107,7 +107,7 @@ export const getFixSuggestions = async (text, context) => {
   );
 
   /**
-   * @type Array<fixSuggestion>
+   * @type Array<import("./aitingAppLine.js").FixSuggestion>
    */
   const suggests = JSON.parse(res).map((s) => ({
     ...s,
@@ -117,14 +117,14 @@ export const getFixSuggestions = async (text, context) => {
 
   /**
    * @param {string} text
-   * @param {Array<fixSuggestion>} suggestions
-   * @returns {Array<fixSuggestion>}
+   * @param {Array<import("./aitingAppLine.js").FixSuggestion>} suggestions
+   * @returns {Array<import("./aitingAppLine.js").FixSuggestion>}
    */
   function fixFixSuggestion(text, suggestions) {
     /**
      * @param {string} text
-     * @param {fixSuggestion} suggestion
-     * @returns {fixSuggestion | null}
+     * @param {import("./aitingAppLine.js").FixSuggestion} suggestion
+     * @returns {import("./aitingAppLine.js").FixSuggestion | null}
      */
     function fixFixSuggestionOffset(text, suggestion) {
       const matches = Array.from(
@@ -143,7 +143,6 @@ export const getFixSuggestions = async (text, context) => {
       .map((s) => fixFixSuggestionOffset(text, s))
       .filter((s) => Boolean(s));
   }
-  console.log(fixFixSuggestion(text, suggests));
   return fixFixSuggestion(text, suggests);
 };
 

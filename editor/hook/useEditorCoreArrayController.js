@@ -8,6 +8,8 @@ import {
 } from "../../src/utils/array.js";
 
 /**
+ * Lineを格納した配列の状態を管理しやすくする
+ *
  * @template T
  * @param {Array<T>} init
  * @returns {[()=> T[], {

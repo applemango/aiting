@@ -12,13 +12,16 @@
      autoCriticize?: boolean;
 
      copy?: boolean;
+     title?: boolean;
  }} Feature
  */
 
 /**
+ * 有効化されている機能を管理する
+ *
  * @param {{
- *    settings: Settings,
- *    mode: WrittingMode
+ *    settings: import("./useSettings").Settings
+ *    mode: import("./useWrittingMode").WrittingMode
  * }} api
  * @returns Feature
  */

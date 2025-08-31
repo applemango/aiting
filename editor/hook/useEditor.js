@@ -9,16 +9,26 @@ import { useEffect } from "../../hook/useEffect.js";
 import { useEditorSuggestion } from "./useEditorSuggestion.js";
 
 /**
+ * @typedef {{
+ *  editor: import("./useEditorCore.js").useEditorCoreApi,
+ *  utils: import("./useEditorUtils.js").useEditorUtilsApi,
+ *  suggestion: import("./useEditorSuggestion.js").useEditorSuggestionApi,
+ * }} useEditorApi
+ */
+
+/**
+ * editorの状態管理に必要なものすべて
+ * grammerCheckCoreに関してはレイヤーが上の方に行ってしまったので
+ * 今はaitingAppLineGrammarCheck.jsにある
  *
  * @param {{
- *    settings: import("../aiting.js").Settings,
- *    feature: import("../aiting.js").Feature
+ *    settings: import("./useSettings.js").Settings,
+ *    feature: import("./useFeatures.js").Feature
  * }} api
- * @returns
  */
 export const useEditor = (api) => {
   /**
-   *
+   * Lineの操作関連
    */
   const editorCore = useEditorCore();
   const {
@@ -37,19 +47,19 @@ export const useEditor = (api) => {
   } = editorCore;
 
   /**
-   *
+   * 独立した小さな機能
    */
   const utilsCore = useEditorUtils({ editor: editorCore });
   const { copy } = utilsCore;
 
   /**
-   *
+   * カーソル関連
    */
   const cursorCore = useEditorCoreCursor({ editor: editorCore });
   const { setCursorPosition, focus } = cursorCore;
 
   /**
-   *
+   * サジェスト関連 ( どっちかって言うと保管に近い )
    */
   const suggestionCore = useEditorSuggestion({
     editor: editorCore,
@@ -65,7 +75,7 @@ export const useEditor = (api) => {
   const grammerCheckCore = undefined;
 
   /**
-   *
+   * DOMイベント関連
    */
   const domEventsCore = useEditorCoreDomEvents({
     editor: editorCore,
@@ -74,6 +84,9 @@ export const useEditor = (api) => {
   });
   const { registerEvent, onCreateLine, onDeleteLine } = domEventsCore;
 
+  /**
+   * 最初Lineの配列が空なのでこっちでLineを作成して入力操作を行えるようにする
+   */
   useEffect(
     "initEditor",
     function init() {

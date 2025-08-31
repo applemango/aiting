@@ -2,6 +2,11 @@
 import { component, h } from "../src/dom/virtualdom.js";
 
 /**
+ * いちいちh("div", {}, )とかh("img", {atrr: {src: "./"}})
+ * とかそういうのを書くのが面倒なのでよく使うやつをコンポーネント化しただけ
+ */
+
+/**
  * @typedef {import("../src/dom/virtualdom").VNodeProps} VNodeProps
  * @typedef {import("../src/dom/virtualdom").VNodeChild} VNodeChild
  * @typedef {import("../src/dom/virtualdom").VNodeChildren} VNodeChildren

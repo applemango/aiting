@@ -10,7 +10,7 @@ import { component } from "../src/dom/virtualdom.js";
  */
 
 /**
- * @type {typeof component<{}>}
+ * @type {typeof component<{menu: Menu, id: string}>}
  */
 const AitingAppLineSixdotComponent = component;
 export const AitingAppLineSixdot = AitingAppLineSixdotComponent(
@@ -39,9 +39,9 @@ export const AitingAppLineSixdot = AitingAppLineSixdotComponent(
           Box(
             {
               attr: { class: "dropdownMenuItem" },
-              onClick: () => {
+              onClick: (e) => {
                 setOpen(false);
-                m.action();
+                m.action(e);
               },
             },
             Icon({ name: m.icon }),
