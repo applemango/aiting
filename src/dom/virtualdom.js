@@ -322,27 +322,27 @@ export const page = (page) => new Page(page);
  * 速度を求めなければrender関数のみでよいが、最初から構築されてしまうため、アニメーションの実行などが面倒なので、一部のみ変更するpatchを作った
  */
 export class Page {
-  constructor(page) {
+  constructor(page, root = document.getElementById("root")) {
     this.page = page;
     this.old = {};
+    this.root = root;
   }
-  render() {
+  render(vdom) {
     const ms = timeKeeper(() => {
-      const res = this.page();
-      const root = document.getElementById("root");
-      this.old = res;
-      const v = componentRenderHelper(res);
+      const p = vdom || this.page();
+      const root = this.root || document.getElementById("root");
+      this.old = p;
+      const v = componentRenderHelper(p);
       root?.replaceChildren(v);
     });
     console.log("render: ", ms);
   }
-  patch() {
+  patch(vdom) {
     const ms = timeKeeper(() => {
-      const res = this.page();
-      const root = document.getElementById("root");
-      componentPatchHelper(root, this.old, res);
-      //console.log(res);
-      this.old = res;
+      const p = vdom || this.page();
+      const root = this.root || document.getElementById("root");
+      componentPatchHelper(root, this.old, p);
+      this.old = p;
     });
     console.log("patch: ", ms);
   }

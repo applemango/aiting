@@ -38,14 +38,16 @@
 - `index.html`
 
   - このファイルは何もしませんただ
-    いわゆる `static`なサイトだと.htmlではないとサイトを表示できないから使っているだけで本体は`./app/page.js`です
+    いわゆる `static`なサイトだと.htmlではないとサイトを表示できないから使っているだけで本体は`./page/router.js`です
 
-- `app`
+- `page`
   - `html`の代わりに作成された `js`が入っています
 - `hook`, `components`
   - `react`に寄せてるので多分読めます
 - `editor`
-  - editor関連のコードですが、現在はeditorの内部機能を支配する`./editor/hook`しか入っておらず基本`./app/page.js`に含まれています
+  - editor関連のコードです
+- `test`
+  - テストです `https://aiting.i32.jp/test`で実行されています
 
 **技術スタック**
 
