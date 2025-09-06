@@ -84,13 +84,33 @@ class Test {
       toBe: this.parseToBe(something),
     });
   }
-  equal(a, b) {
+
+  equal(a, b, deps = 0) {
+    // 循環参照的なことが起こる可能性を考慮した
+    // ほとんど絶対に起こらない
+    if (deps > 1e5) return false;
+
     if (Array.isArray(a) && Array.isArray(b)) {
       if (a.length != b.length) return;
-      return a.every((v, i) => v == b[i]);
+      return a.every((v, i) => this.equal(v, b[i], deps++));
     }
+
+    // 関数が等しいことをテストすることは無いし
+    // あったとしたら多分とんでもなく悪いコードだと思うけど一応
+    if (typeof a == "function" && typeof b == "function") {
+      return this.equal(a.toString(), b.toString());
+    }
+
+    if (typeof a == "object" && typeof b == "object") {
+      return (
+        Object.keys(a).length == Object.keys(b).length &&
+        Object.keys(a).every((k) => this.equal(a[k], b[k], deps++))
+      );
+    }
+
     return a == b;
   }
+
   /**
    * @returns { TestResult[]}
    */

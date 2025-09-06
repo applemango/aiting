@@ -87,6 +87,7 @@ export const AitingAppLine = AitingAppLineCompoent(({ line, api, i }) => {
     setFixSuggestions(
       updateFixSuggestions(fixSuggestions(), line.text, previousLineText()),
     );
+    setActiveFixSuggestion("");
   }
 
   function useFixSuggestion(suggestion) {

@@ -19,23 +19,19 @@ export const testUtils = new TestFunction()
   .describe("src/utils/sort.js", (t) => {
     t.expect(quickSort([3, 6, 9, 2])).toBe([2, 3, 6, 9]);
     t.expect(
-      ArrayToFlat(
-        quickSort(
-          [
-            [true, false],
-            ["a", "b", "c", "d"],
-            [1, 2, 3],
-          ],
-          (a, b) => a.length >= b.length,
-        ),
+      quickSort(
+        [
+          [true, false],
+          ["a", "b", "c", "d"],
+          [1, 2, 3],
+        ],
+        (a, b) => a.length >= b.length,
       ),
-    ).toBe(
-      ArrayToFlat([
-        ["a", "b", "c", "d"],
-        [1, 2, 3],
-        [true, false],
-      ]),
-    );
+    ).toBe([
+      ["a", "b", "c", "d"],
+      [1, 2, 3],
+      [true, false],
+    ]);
   })
   .describe("src/utils/array.js", (t) => {
     t.expect(ArrayInsert([1, 2, 3], 4, -1)).toBe([1, 2, 3, 4]);

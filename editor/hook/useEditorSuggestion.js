@@ -180,10 +180,13 @@ export const useEditorSuggestion = (api) => {
         async () =>
           await getGeminiChatCompletionTextWrapper(
             getGeminiChatCompletion({
+              system_instruction: {
+                parts: [{ text: baseText }],
+              },
               contents: [
                 {
                   role: "user",
-                  parts: [{ text: baseText.concat("\nuser: ".concat(text)) }],
+                  parts: [{ text }],
                 },
               ],
             }),
