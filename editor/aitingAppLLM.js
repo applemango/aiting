@@ -160,7 +160,7 @@ export const getRewritedText = async (text) => {
         },
         { role: "user", content: text },
       ],
-      model: "openai/gpt-oss-120b",
+      //model: "openai/gpt-oss-120b",
     }),
   );
 };

@@ -173,7 +173,7 @@ export const useEditorSuggestion = (api) => {
               ],
             }),
           ),
-        250,
+        300,
       );
 
       const gemini = autoComplete(
@@ -191,7 +191,7 @@ export const useEditorSuggestion = (api) => {
               ],
             }),
           ),
-        1000,
+        4000,
       );
     },
     [suggestion()?.info],

@@ -24,7 +24,7 @@ const getGroqChatCompletion = async (body) => {
        * モデル一覧
        * @see https://console.groq.com/docs/models
        */
-      model: "gemma2-9b-it",
+      model: "moonshotai/kimi-k2-instruct",
       max_tokens: 4096,
 
       ...body,

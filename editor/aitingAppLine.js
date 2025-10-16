@@ -73,7 +73,6 @@ export const AitingAppLine = AitingAppLineCompoent(({ line, api, i }) => {
   }
 
   async function createFixSuggestion() {
-    if (!api.feature.autoGrammarCheck) return;
     setFixSuggestions(
       await getFixSuggestions(line.text, api.editor.state().join("\n")),
     );
